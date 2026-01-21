@@ -1,0 +1,16 @@
+{
+  "tasks": {
+    "run": "zig build run --",
+    "run:example": "zig build run -- examples/hello.js",
+    "build": "zig build -Doptimize=ReleaseSmall",
+    "format": "deno fmt && zig fmt ."
+  },
+  "fmt": {
+    "proseWrap": "preserve"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-var"]
+    }
+  }
+}

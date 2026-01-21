@@ -1,0 +1,20 @@
+.{
+    .name = .zemu,
+    .version = "0.0.1",
+    .fingerprint = 0x9be60676ef8cd25a,
+    .minimum_zig_version = "0.15.2",
+    .dependencies = .{
+        .mquickjs = .{
+            .url = "https://github.com/mitchellh/zig-mquickjs/archive/refs/heads/main.tar.gz",
+            .hash = "12207b771a221b45638d0a519c0056dd984bccbeae54a5017cea40248920b646ed3e",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "examples",
+        "README.md",
+        "LICENSE",
+    },
+}
