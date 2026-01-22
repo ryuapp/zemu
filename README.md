@@ -1,6 +1,6 @@
 # Zemu
 
-A tiny JavaScript runtime built with [Zig](https://ziglang.org/) using the [Micro QuickJS](https://github.com/bellard/mquickjs) engine. The binary size is under 500KB.
+A tiny JavaScript runtime built with [Zig](https://ziglang.org/) using [Micro QuickJS](https://github.com/bellard/mquickjs) engine. The binary size is under 500KB.
 
 ## Usage
 
@@ -20,17 +20,15 @@ zemu -e "48 + 19"
 ### Command Line Options
 
 ```sh
-Usage:
-  zemu [options] <file>
-  zemu -e <code>
+Usage: zemu [options] <file>
 
 Options:
-  -h, --help       Show help message
-  -v, --version    Show version information
+  -h, --help       Print this help message
+  -v, --version    Print this version
   -e, --eval CODE  Evaluate inline JavaScript code
 
 Examples:
-  zemu hello.js           Run a JavaScript file
+  zemu hello.js                   Run a JavaScript file
   zemu -e "console.log(48 + 19)"  Evaluate inline code
 ```
 
