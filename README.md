@@ -62,3 +62,7 @@ See the `examples/` directory for sample scripts:
 ## License
 
 MIT License
+
+### Third-party License
+
+Zemu includes a modified copy of [mitchellh/zig-mquickjs](https://github.com/mitchellh/zig-mquickjs). See [lib/mquickjs/LICENSE](./lib/mquickjs/LICENSE) for the original MIT License.
