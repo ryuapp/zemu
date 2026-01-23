@@ -30,17 +30,17 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            target: x86_64-linux
+            target: x86_64-linux-musl
           - os: ubuntu-24.04-arm
-            target: aarch64-linux
+            target: aarch64-linux-musl
           - os: macos-latest
             target: aarch64-macos
           - os: macos-15-intel
             target: x86_64-macos
           - os: windows-latest
-            target: x86_64-windows
+            target: x86_64-windows-gnu
           - os: windows-11-arm
-            target: aarch64-windows
+            target: aarch64-windows-gnu
 
     steps:
       - uses: actions/checkout@v6
@@ -57,7 +57,7 @@ jobs:
         working-directory: lib/mquickjs
 
       - name: Build
-        run: zig build -Doptimize=ReleaseSmall
+        run: zig build -Doptimize=ReleaseSmall -Dtarget=${{ matrix.target }} -Dcpu=baseline
 
       - name: Collect binary size
         shell: bash
