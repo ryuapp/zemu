@@ -2,7 +2,7 @@
   "tasks": {
     "run": "zig build run --",
     "run:example": "zig build run -- examples/hello.js",
-    "build": "zig build -Doptimize=ReleaseSmall",
+    "build": "zig build -Doptimize=ReleaseSmall -Dcpu=baseline",
     "format": "deno fmt && zig fmt ."
   },
   "fmt": {
