@@ -11,10 +11,10 @@
         "README.md",
     },
     .dependencies = .{
-        // bellard/mquickjs
+        // bellard/mquickjs (updated to ee50431)
         .mquickjs = .{
-            .url = "https://github.com/bellard/mquickjs/archive/767e5db54241f0b53193a04aea193c823a9e3121.tar.gz",
-            .hash = "N-V-__8AAH_KDgAc_2J3w461iC-aXVoZUUf3cikp2GONAVnb",
+            .url = "https://github.com/bellard/mquickjs/archive/ee50431eac9b14b99f722b537ec4cac0c8dd75ab.tar.gz",
+            .hash = "N-V-__8AAD3LDgC74fob6ajlm5AA9Rs7EZl5F8Ivx472xUpH",
         },
     },
 }
