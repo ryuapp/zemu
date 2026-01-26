@@ -1,9 +1,12 @@
 {
+  "version": "0.0.1",
   "tasks": {
     "run": "zig build run --",
     "run:example": "zig build run -- examples/hello.js",
     "build": "zig build -Doptimize=ReleaseSmall -Dcpu=baseline",
-    "format": "deno fmt && zig fmt ."
+    "build:npm": "deno run --allow-run --allow-read --allow-write scripts/build-npm.ts",
+    "format": "deno fmt && zig fmt .",
+    "publish:npm": "deno run --allow-read --allow-run scripts/publish-npm.ts"
   },
   "fmt": {
     "proseWrap": "preserve"
