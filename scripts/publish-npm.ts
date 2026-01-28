@@ -16,6 +16,8 @@ if (!VERSION) {
   Deno.exit(1);
 }
 
+const isDryRun = Deno.args.includes("--dry-run");
+
 async function publishPackage(pkgName: string) {
   const pkgDir = `npm/${pkgName}`;
 
@@ -29,10 +31,17 @@ async function publishPackage(pkgName: string) {
 
   // Publish
   const displayName = pkgName === "zemu" ? "zemu" : `@zemujs/${pkgName}`;
-  console.log(`📦 Publishing ${displayName}@${VERSION}...`);
+  console.log(
+    `📦 Publishing ${displayName}@${VERSION}${isDryRun ? " (dry-run)" : ""}...`,
+  );
+
+  const args = ["publish", "--access", "public"];
+  if (isDryRun) {
+    args.push("--dry-run");
+  }
 
   const cmd = new Deno.Command("npm", {
-    args: ["publish", "--access", "public"],
+    args,
     cwd: pkgDir,
     stdout: "inherit",
     stderr: "inherit",
@@ -49,8 +58,14 @@ async function publishPackage(pkgName: string) {
 }
 
 // Publish all packages
+if (isDryRun) {
+  console.log("🔍 Dry-run mode enabled\n");
+}
+
 for (const pkg of PACKAGES) {
   await publishPackage(pkg);
 }
 
-console.log("\n✨ All packages published successfully!");
+console.log(
+  `\n✨ All packages ${isDryRun ? "validated" : "published"} successfully!`,
+);
