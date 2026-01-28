@@ -17,6 +17,8 @@ if (!VERSION) {
 }
 
 const isDryRun = Deno.args.includes("--dry-run");
+const otpArg = Deno.args.find((arg) => arg.startsWith("--otp="));
+const otp = otpArg?.split("=")[1];
 
 async function publishPackage(pkgName: string) {
   const pkgDir = `npm/${pkgName}`;
@@ -38,6 +40,9 @@ async function publishPackage(pkgName: string) {
   const args = ["publish", "--access", "public"];
   if (isDryRun) {
     args.push("--dry-run");
+  }
+  if (otp) {
+    args.push(`--otp=${otp}`);
   }
 
   const cmd = new Deno.Command("npm", {
