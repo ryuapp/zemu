@@ -116,7 +116,7 @@ async function buildPlatformPackage(target: typeof TARGETS[0]) {
     description: `${target.pkg} distribution of Zemu`,
     repository: {
       type: "git",
-      url: "https://github.com/ryuapp/zemu.git",
+      url: "git+https://github.com/ryuapp/zemu.git",
     },
     license: "MIT",
     os: [os],
@@ -203,7 +203,7 @@ process.exit(result.status ?? 1);
     description: "Micro JavaScript runtime powered by QuickJS",
     repository: {
       type: "git",
-      url: "https://github.com/ryuapp/zemu.git",
+      url: "git+https://github.com/ryuapp/zemu.git",
     },
     license: "MIT",
     bin: {
