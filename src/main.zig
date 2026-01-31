@@ -13,16 +13,19 @@ pub fn main() !void {
     var args = try cli.parse(allocator);
     defer args.deinit();
 
+    // Extract user arguments (args after script name or eval code)
+    const user_args = args.getUserArgs();
+
     if (args.help) {
         help_cmd.execute();
     } else if (args.version) {
         std.debug.print("{s}\n", .{version.VERSION});
     } else if (args.eval) |code| {
-        eval_cmd.execute(allocator, code) catch {
+        eval_cmd.execute(allocator, code, user_args) catch {
             std.process.exit(1);
         };
     } else if (args.file) |filename| {
-        run_cmd.execute(allocator, filename) catch {
+        run_cmd.execute(allocator, filename, user_args) catch {
             std.process.exit(1);
         };
     }

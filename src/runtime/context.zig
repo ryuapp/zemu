@@ -11,8 +11,8 @@ pub const ZemuContext = struct {
     ctx: *mquickjs.Context,
     allocator: std.mem.Allocator,
 
-    /// Initialize a new Zemu context with the given buffer size
-    pub fn init(allocator: std.mem.Allocator, buffer_size: usize) !ZemuContext {
+    /// Initialize a new Zemu context with the given buffer size and command-line arguments
+    pub fn init(allocator: std.mem.Allocator, buffer_size: usize, args: []const [:0]const u8) !ZemuContext {
         // Allocate aligned buffer for QuickJS (8-byte alignment)
         const buffer = try allocator.alignedAlloc(u8, @enumFromInt(8), buffer_size);
         errdefer allocator.free(buffer);
@@ -21,31 +21,71 @@ pub const ZemuContext = struct {
         const ctx = try mquickjs.Context.new(buffer, stdlib);
         errdefer ctx.free();
 
-        // Inject simple console.log polyfill (stdout/stderr separated)
-        const polyfill =
-            \\globalThis.Zemu = {
+        // Build JSON array from args with proper string escaping
+        // First, calculate the required size
+        var json_size: usize = 2; // for "[]"
+        for (args, 0..) |arg, i| {
+            if (i > 0) json_size += 1; // comma
+            json_size += 2; // quotes
+            for (arg) |c| {
+                if (c == '"' or c == '\\') json_size += 1; // escape char
+                json_size += 1; // the char itself
+            }
+        }
+
+        const args_json_buf = try allocator.alloc(u8, json_size);
+        defer allocator.free(args_json_buf);
+        var pos: usize = 0;
+        args_json_buf[pos] = '[';
+        pos += 1;
+        for (args, 0..) |arg, i| {
+            if (i > 0) {
+                args_json_buf[pos] = ',';
+                pos += 1;
+            }
+            args_json_buf[pos] = '"';
+            pos += 1;
+            for (arg) |c| {
+                if (c == '"' or c == '\\') {
+                    args_json_buf[pos] = '\\';
+                    pos += 1;
+                }
+                args_json_buf[pos] = c;
+                pos += 1;
+            }
+            args_json_buf[pos] = '"';
+            pos += 1;
+        }
+        args_json_buf[pos] = ']';
+        pos += 1;
+
+        // Inject simple console.log polyfill (stdout/stderr separated) with args
+        const polyfill = try std.fmt.allocPrint(allocator,
+            \\globalThis.Zemu = {{
             \\  __stdout: [],
-            \\  __stderr: []
-            \\};
-            \\var console = {
-            \\  log: function() {
+            \\  __stderr: [],
+            \\  args: {s}
+            \\}};
+            \\var console = {{
+            \\  log: function() {{
             \\    var msg = Array.prototype.slice.call(arguments).join(' ');
             \\    globalThis.Zemu.__stdout.push(msg);
-            \\  },
-            \\  error: function() {
+            \\  }},
+            \\  error: function() {{
             \\    var msg = Array.prototype.slice.call(arguments).join(' ');
             \\    globalThis.Zemu.__stderr.push(msg);
-            \\  },
-            \\  warn: function() {
+            \\  }},
+            \\  warn: function() {{
             \\    var msg = Array.prototype.slice.call(arguments).join(' ');
             \\    globalThis.Zemu.__stderr.push(msg);
-            \\  },
-            \\  info: function() {
+            \\  }},
+            \\  info: function() {{
             \\    var msg = Array.prototype.slice.call(arguments).join(' ');
             \\    globalThis.Zemu.__stdout.push(msg);
-            \\  }
-            \\};
-        ;
+            \\  }}
+            \\}};
+        , .{args_json_buf[0..pos]});
+        defer allocator.free(polyfill);
 
         const polyfill_z = try allocator.dupeZ(u8, polyfill);
         defer allocator.free(polyfill_z);

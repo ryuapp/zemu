@@ -12,6 +12,18 @@ pub const Args = struct {
     pub fn deinit(self: *Args) void {
         std.process.argsFree(self.allocator, self.raw_args);
     }
+
+    /// Get user arguments (arguments after the script name or eval code)
+    pub fn getUserArgs(self: *const Args) [][:0]u8 {
+        if (self.eval != null) {
+            // For eval mode: skip "zemu", "-e", "code"
+            if (self.raw_args.len > 3) return self.raw_args[3..];
+        } else if (self.file != null) {
+            // For file mode: skip "zemu", "script.js"
+            if (self.raw_args.len > 2) return self.raw_args[2..];
+        }
+        return &[_][:0]u8{};
+    }
 };
 
 /// Parse command-line arguments
