@@ -49,6 +49,21 @@ console.error("error"); // Print to stderr
 console.warn("warning"); // Print to stderr
 ```
 
+### Command-Line Arguments
+
+`Zemu.args` returns the script arguments to the program.
+
+```js
+// Run: zemu script.js -i --verbose hello
+console.log(Zemu.args); // ["-i", "--verbose", "hello"]
+console.log(Zemu.args[0]); // "-i"
+console.log(Zemu.args.length); // 3
+
+// Also works with -e flag
+// Run: zemu -e "console.log(Zemu.args)" -i --verbose hello
+// Output: -i,--verbose,hello
+```
+
 ## Examples
 
 See the `examples/` directory for sample scripts:
@@ -56,6 +71,7 @@ See the `examples/` directory for sample scripts:
 - `hello.js` - Basic console output
 - `fibonacci.js` - Recursive function example
 - `error.js` - Error handling demonstration
+- `args.js` - Command-line arguments usage
 
 ## License
 
