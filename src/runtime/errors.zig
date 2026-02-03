@@ -14,19 +14,23 @@ pub fn printException(ctx: *mquickjs.Context, allocator: std.mem.Allocator) void
     defer exception.free();
 
     const error_msg = exception.toString(allocator) catch {
-        std.debug.print("Failed to get exception message\n", .{});
+        var stderr_writer = std.fs.File.stderr().writer(&.{});
+        const stderr = &stderr_writer.interface;
+        stderr.print("Failed to get exception message\n", .{}) catch {};
         return;
     };
     defer allocator.free(error_msg);
 
-    std.debug.print("Error: {s}\n", .{error_msg});
+    var stderr_writer = std.fs.File.stderr().writer(&.{});
+    const stderr = &stderr_writer.interface;
+    stderr.print("Error: {s}\n", .{error_msg}) catch {};
 
     // Try to get stack trace if available
     if (exception.getProperty(allocator, "stack")) |stack_prop| {
         defer stack_prop.free();
         if (stack_prop.toString(allocator)) |stack_str| {
             defer allocator.free(stack_str);
-            std.debug.print("{s}\n", .{stack_str});
+            stderr.print("{s}\n", .{stack_str}) catch {};
         } else |_| {
             // No stack trace available
         }

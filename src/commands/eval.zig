@@ -7,8 +7,6 @@ pub fn execute(allocator: std.mem.Allocator, code: []const u8, args: []const [:0
     defer ctx.deinit();
 
     const result = try ctx.eval(code, "<eval>");
-
-    // Flush any console.log output
     ctx.flushLogs();
 
     // Print the result if it's not undefined
@@ -16,7 +14,9 @@ pub fn execute(allocator: std.mem.Allocator, code: []const u8, args: []const [:0
         var buf: @import("mquickjs").Value.StringBuf = undefined;
         var len: usize = 0;
         if (result.toCStringLen(ctx.getContext(), &len, &buf)) |str| {
-            std.debug.print("{s}\n", .{std.mem.span(str)});
+            var stdout_writer = std.fs.File.stdout().writer(&.{});
+            const stdout = &stdout_writer.interface;
+            stdout.print("{s}\n", .{std.mem.span(str)}) catch {};
         }
     }
 }

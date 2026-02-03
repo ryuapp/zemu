@@ -1,7 +1,9 @@
 const std = @import("std");
 
 pub fn execute() void {
-    std.debug.print(
+    var stdout_writer = std.fs.File.stdout().writer(&.{});
+    const stdout = &stdout_writer.interface;
+    stdout.print(
         \\Usage: zemu [options] <file>
         \\
         \\Options:
@@ -14,5 +16,6 @@ pub fn execute() void {
         \\  zemu -e "console.log(48 + 19)"  Evaluate inline code
         \\
         \\GitHub: https://github.com/ryuapp/zemu
-    , .{});
+        \\
+    , .{}) catch {};
 }

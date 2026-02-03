@@ -51,7 +51,9 @@ pub fn parse(allocator: std.mem.Allocator) !Args {
         result.version = true;
     } else if (std.mem.eql(u8, first_arg, "-e") or std.mem.eql(u8, first_arg, "--eval")) {
         if (raw_args.len < 3) {
-            std.debug.print("Error: -e requires an argument\n", .{});
+            var stderr_writer = std.fs.File.stderr().writer(&.{});
+            const stderr = &stderr_writer.interface;
+            stderr.print("Error: -e requires an argument\n", .{}) catch {};
             std.process.exit(1);
         }
         result.eval = raw_args[2];

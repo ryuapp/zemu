@@ -92,7 +92,9 @@ pub const ZemuContext = struct {
 
         const result = mquickjs.Value.eval(ctx, polyfill_z, "<init>", .{});
         if (result.isException()) {
-            std.debug.print("Failed to initialize console polyfill\n", .{});
+            var stderr_writer = std.fs.File.stderr().writer(&.{});
+            const stderr = &stderr_writer.interface;
+            stderr.print("Failed to initialize console polyfill\n", .{}) catch {};
         }
 
         return ZemuContext{
@@ -167,7 +169,9 @@ pub const ZemuContext = struct {
 
         // Check if an exception occurred
         if (result.isException()) {
-            std.debug.print("JavaScript exception occurred\n", .{});
+            var stderr_writer = std.fs.File.stderr().writer(&.{});
+            const stderr = &stderr_writer.interface;
+            stderr.print("JavaScript exception occurred\n", .{}) catch {};
             return errors.ZemuError.EvalFailed;
         }
 

@@ -19,7 +19,9 @@ pub fn main() !void {
     if (args.help) {
         help_cmd.execute();
     } else if (args.version) {
-        std.debug.print("{s}\n", .{version.VERSION});
+        var stdout_writer = std.fs.File.stdout().writer(&.{});
+        const stdout = &stdout_writer.interface;
+        stdout.print("{s}\n", .{version.VERSION}) catch {};
     } else if (args.eval) |code| {
         eval_cmd.execute(allocator, code, user_args) catch {
             std.process.exit(1);
