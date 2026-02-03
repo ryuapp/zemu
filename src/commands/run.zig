@@ -5,13 +5,17 @@ const context = @import("../runtime/context.zig");
 pub fn execute(allocator: std.mem.Allocator, filename: []const u8, args: []const [:0]const u8) !void {
     // Read the file
     const file = std.fs.cwd().openFile(filename, .{}) catch {
-        std.debug.print("error: file not found: {s}\n", .{filename});
+        var stderr_writer = std.fs.File.stderr().writer(&.{});
+        const stderr = &stderr_writer.interface;
+        stderr.print("error: file not found: {s}\n", .{filename}) catch {};
         std.process.exit(1);
     };
     defer file.close();
 
     const code = file.readToEndAlloc(allocator, 10 * 1024 * 1024) catch {
-        std.debug.print("error: cannot read file: {s}\n", .{filename});
+        var stderr_writer = std.fs.File.stderr().writer(&.{});
+        const stderr = &stderr_writer.interface;
+        stderr.print("error: cannot read file: {s}\n", .{filename}) catch {};
         std.process.exit(1);
     };
     defer allocator.free(code);
@@ -21,6 +25,5 @@ pub fn execute(allocator: std.mem.Allocator, filename: []const u8, args: []const
     defer ctx.deinit();
 
     _ = try ctx.eval(code, filename);
-    // Flush any console.log output
     ctx.flushLogs();
 }
