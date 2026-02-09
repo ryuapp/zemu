@@ -2,3 +2,5 @@ zig-out/
 .zig-cache/
 docs/
 npm
+release-temp/
+release-assets/

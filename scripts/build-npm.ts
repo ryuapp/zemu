@@ -1,29 +1,5 @@
 import denoConfig from "../deno.json" with { type: "json" };
-
-const TARGETS = [
-  { build: "x86_64-linux-musl", dir: "x86_64-linux", pkg: "linux-x64-musl" },
-  {
-    build: "aarch64-linux-musl",
-    dir: "aarch64-linux",
-    pkg: "linux-arm64-musl",
-  },
-  { build: "x86_64-macos", dir: "x86_64-macos", pkg: "darwin-x64" },
-  {
-    build: "aarch64-macos",
-    dir: "aarch64-macos",
-    pkg: "darwin-arm64",
-  },
-  {
-    build: "x86_64-windows-gnu",
-    dir: "x86_64-windows",
-    pkg: "win32-x64",
-  },
-  {
-    build: "aarch64-windows-gnu",
-    dir: "aarch64-windows",
-    pkg: "win32-arm64",
-  },
-];
+import { getBinaryName, PLATFORMS } from "./platforms.ts";
 
 const VERSION = denoConfig.version || "0.0.0-dev";
 
@@ -50,77 +26,74 @@ async function buildBinaries() {
   await Deno.remove(DIST_DIR, { recursive: true }).catch(() => {});
 
   // Build for each target
-  for (const { build, dir } of TARGETS) {
-    console.log(`\n  Building ${build}...`);
+  for (const platform of PLATFORMS) {
+    console.log(`\n  Building ${platform.target}...`);
 
     const buildCmd = new Deno.Command("zig", {
       args: [
         "build",
         "-Doptimize=ReleaseSmall",
         "-Dcpu=baseline",
-        `-Dtarget=${build}`,
+        `-Dtarget=${platform.target}`,
       ],
     });
 
     const { code, stderr } = await buildCmd.output();
 
     if (code !== 0) {
-      console.error(`  ❌ Build failed for ${build}`);
+      console.error(`  ❌ Build failed for ${platform.target}`);
       console.error(new TextDecoder().decode(stderr));
       Deno.exit(1);
     }
 
     // Create target directory
-    const ext = dir.includes("windows") ? ".exe" : "";
-    const targetDir = `${DIST_DIR}/${dir}`;
+    const binName = getBinaryName(platform);
+    const targetDir = `${DIST_DIR}/${platform.buildDir}`;
     await Deno.mkdir(targetDir, { recursive: true });
 
     // Move binary to target directory
-    const srcBinary = `${DIST_DIR}/zemu${ext}`;
-    const dstBinary = `${targetDir}/zemu${ext}`;
+    const srcBinary = `${DIST_DIR}/${binName}`;
+    const dstBinary = `${targetDir}/${binName}`;
 
     await Deno.rename(srcBinary, dstBinary);
 
-    console.log(`  ✅ ${build}`);
+    console.log(`  ✅ ${platform.target}`);
   }
 }
 
-async function buildPlatformPackage(target: typeof TARGETS[0]) {
-  const pkgDir = `npm/${target.pkg}`;
+async function buildPlatformPackage(platform: typeof PLATFORMS[0]) {
+  const pkgDir = `npm/${platform.npmPackage}`;
   await Deno.mkdir(pkgDir, { recursive: true });
 
   // Determine binary name
-  const binName = target.dir.includes("windows") ? "zemu.exe" : "zemu";
-  const binPath = `zig-out/bin/${target.dir}/${binName}`;
+  const binName = getBinaryName(platform);
+  const binPath = `zig-out/bin/${platform.buildDir}/${binName}`;
 
   // Check if binary exists
   try {
     await Deno.stat(binPath);
   } catch {
-    console.warn(`⚠️  Binary not found: ${binPath}, skipping ${target.pkg}`);
+    console.warn(
+      `⚠️  Binary not found: ${binPath}, skipping ${platform.npmPackage}`,
+    );
     return;
   }
 
   // Copy binary
   await Deno.copyFile(binPath, `${pkgDir}/${binName}`);
 
-  // Parse platform info from package name (e.g., "linux-x64-musl" -> os: linux, cpu: x64)
-  const parts = target.pkg.split("-");
-  const os = parts[0]; // linux, darwin, win32
-  const cpu = parts[1]; // x64, arm64
-
   // Create package.json
   const packageJson: PlatformPackageJson = {
-    name: `@zemujs/${target.pkg}`,
+    name: `@zemujs/${platform.npmPackage}`,
     version: VERSION,
-    description: `${target.pkg} distribution of Zemu`,
+    description: `${platform.npmPackage} distribution of Zemu`,
     repository: {
       type: "git",
       url: "git+https://github.com/ryuapp/zemu.git",
     },
     license: "MIT",
-    os: [os],
-    cpu: [cpu],
+    os: [platform.os],
+    cpu: [platform.cpu],
     preferUnplugged: true,
   };
 
@@ -130,13 +103,13 @@ async function buildPlatformPackage(target: typeof TARGETS[0]) {
   );
 
   // Create README
-  const readme = `# @zemujs/${target.pkg}
+  const readme = `# @zemujs/${platform.npmPackage}
 
-${target.pkg} distribution of [Zemu](https://github.com/ryuapp/zemu).
+${platform.npmPackage} distribution of [Zemu](https://github.com/ryuapp/zemu).
 `;
   await Deno.writeTextFile(`${pkgDir}/README.md`, readme);
 
-  console.log(`  ✅ @zemujs/${target.pkg}`);
+  console.log(`  ✅ @zemujs/${platform.npmPackage}`);
 }
 
 async function buildMainPackage() {
@@ -192,8 +165,8 @@ process.exit(result.status ?? 1);
 
   // Create package.json
   const optionalDependencies: Record<string, string> = {};
-  for (const target of TARGETS) {
-    optionalDependencies[`@zemujs/${target.pkg}`] = VERSION;
+  for (const platform of PLATFORMS) {
+    optionalDependencies[`@zemujs/${platform.npmPackage}`] = VERSION;
   }
 
   const packageJson = {
@@ -240,8 +213,8 @@ await buildBinaries();
 
 // Build platform packages
 console.log("\n📦 Building platform packages...");
-for (const target of TARGETS) {
-  await buildPlatformPackage(target);
+for (const platform of PLATFORMS) {
+  await buildPlatformPackage(platform);
 }
 
 // Build main package

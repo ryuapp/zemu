@@ -1,0 +1,8 @@
+# tagpr configuration
+# https://github.com/Songmu/tagpr
+
+vPrefix: true
+changelog: true
+
+[versionFile]
+deno.json = "version"
