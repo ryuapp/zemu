@@ -1,14 +1,7 @@
 import denoConfig from "../deno.json" with { type: "json" };
+import { PLATFORMS } from "./platforms.ts";
 
-const PACKAGES = [
-  "linux-x64-musl",
-  "linux-arm64-musl",
-  "darwin-x64",
-  "darwin-arm64",
-  "win32-x64",
-  "win32-arm64",
-  "zemu",
-];
+const PACKAGES = [...PLATFORMS.map((p) => p.npmPackage), "zemu"];
 
 const VERSION = denoConfig.version;
 if (!VERSION) {
@@ -43,6 +36,10 @@ async function publishPackage(pkgName: string) {
   }
   if (otp) {
     args.push(`--otp=${otp}`);
+  }
+  // Use provenance for trusted publishing in CI
+  if (Deno.env.get("CI")) {
+    args.push("--provenance");
   }
 
   const cmd = new Deno.Command("npm", {
