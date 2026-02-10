@@ -1,5 +1,5 @@
 [tagpr]
     vPrefix = true
     releaseBranch = main
-    versionFile = deno.json:version
+    versionFile = deno.json
     changelog = true
