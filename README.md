@@ -75,7 +75,7 @@ See the `examples/` directory for sample scripts:
 
 ## License
 
-MIT License
+MIT
 
 ### Third-party License
 
