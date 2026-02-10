@@ -3,3 +3,4 @@
     releaseBranch = main
     versionFile = deno.json
     changelog = true
+    templateText = release: {{.NextVersion}}\n\n{{.Changelog}}
