@@ -4,3 +4,4 @@
     versionFile = deno.json
     changelog = true
     templateText = release: {{.NextVersion}}\n\n{{.Changelog}}
+    release = false
