@@ -20,7 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag || github.ref }}
           submodules: recursive
 
       - name: Setup Zig
