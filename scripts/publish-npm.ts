@@ -42,8 +42,8 @@ async function publishPackage(pkgName: string) {
     args.push("--provenance");
   }
 
-  const cmd = new Deno.Command("npm", {
-    args,
+  const cmd = new Deno.Command(Deno.execPath(), {
+    args: ["x", "npm", ...args],
     cwd: pkgDir,
     stdout: "inherit",
     stderr: "inherit",
