@@ -5,6 +5,11 @@ on:
     tags:
       - "v*.*.*"
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g. v0.0.2)'
+        required: true
+        type: string
 
 jobs:
   build-and-release:
@@ -15,6 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ inputs.tag || github.ref }}
           submodules: recursive
 
       - name: Setup Zig
@@ -34,6 +40,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
           files: release-assets/*
           draft: false
           prerelease: false
