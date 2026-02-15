@@ -7,7 +7,7 @@
     "build:npm": "deno run --allow-run --allow-read --allow-write scripts/build-npm.ts",
     "setup:release-assets": "deno run --allow-read --allow-write --allow-run=zip scripts/setup-release-assets.ts",
     "format": "deno fmt && zig fmt .",
-    "publish:npm": "deno run --allow-read --allow-run scripts/publish-npm.ts"
+    "publish:npm": "deno run --allow-read --allow-run --allow-env=CI scripts/publish-npm.ts"
   },
   "fmt": {
     "proseWrap": "preserve"
