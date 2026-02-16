@@ -1,7 +1,7 @@
 [tagpr]
     vPrefix = true
     releaseBranch = main
-    versionFile = deno.json
+    versionFile = deno.json, src/version.zig, build.zig.zon
     changelog = true
     templateText = release: {{.NextVersion}}\n\n{{.Changelog}}
     release = false
