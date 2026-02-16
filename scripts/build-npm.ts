@@ -173,7 +173,8 @@ process.exit(result.status ?? 1);
     name: "zemu",
     version: VERSION,
     type: "module",
-    description: "A tiny JavaScript runtime built with Zig using Micro QuickJS engine.",
+    description:
+      "A tiny JavaScript runtime built with Zig using Micro QuickJS engine.",
     repository: {
       type: "git",
       url: "git+https://github.com/ryuapp/zemu.git",
