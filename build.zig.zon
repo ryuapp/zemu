@@ -1,6 +1,6 @@
 .{
     .name = .zemu,
-    .version = "0.0.1",
+    .version = "0.0.3",
     .fingerprint = 0x9be60676ef8cd25a,
     .minimum_zig_version = "0.15.2",
     .dependencies = .{
