@@ -1,5 +1,8 @@
 # Zemu
 
+[![License](https://img.shields.io/github/license/ryuapp/zemu?labelColor=171717&color=39b54a&label=License)](https://github.com/ryuapp/zemu/blob/main/LICENSE)
+[![npm](https://img.shields.io/npm/v/zemu?labelColor=171717&color=39b54a)](https://www.npmjs.com/package/zemu)
+
 A tiny JavaScript runtime built with [Zig](https://ziglang.org/) using [Micro QuickJS](https://github.com/bellard/mquickjs) engine. The binary size is under 500KB.
 
 ## Usage
