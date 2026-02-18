@@ -1,7 +1,8 @@
 [tagpr]
     vPrefix = true
     releaseBranch = main
-    versionFile = deno.json,src/version.zig,build.zig.zon
+    versionFile = deno.json
+    postVersionCommand = deno run -RWE=TAGPR_NEXT_VERSION scripts/sync-version.ts
     changelog = true
     templateText = release: {{.NextVersion}}\n\n{{.Changelog}}
     release = false
